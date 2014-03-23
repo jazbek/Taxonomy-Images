@@ -199,10 +199,9 @@ function taxonomy_image_plugin_get_image_src( $id ) {
 
 	/*
 	 * No image can be found.
-	 * This is most likely caused by a user deleting an attachment before deleting it's association with a taxonomy.
 	 * If we are in the administration panels:
 	 * - Delete the association.
-	 * - Return uri to default.png.
+	 * - Return false.
 	 */
 	if ( is_admin() ) {
 		$assoc = taxonomy_image_plugin_get_associations();
@@ -212,11 +211,12 @@ function taxonomy_image_plugin_get_image_src( $id ) {
 			}
 		}
 		update_option( 'taxonomy_image_plugin', $assoc );
-		return taxonomy_image_plugin_url( 'default.png' );
+		return false;
 	}
 
 	/*
 	 * No image can be found.
+	 * This is most likely caused by a user deleting an attachment before deleting it's association with a taxonomy.
 	 * Return path to blank-image.png.
 	 */
 	return taxonomy_image_plugin_url( 'blank.png' );
@@ -791,13 +791,17 @@ function taxonomy_image_plugin_control_image( $term_id, $taxonomy ) {
 	}
 
 	$img = taxonomy_image_plugin_get_image_src( $attachment_id );
+	if ( $img ) {
+		$img = '<img id="' . esc_attr( 'taxonomy_image_plugin_' . $tt_id ) . '" src="' . esc_url( $img ) . '" alt="" style="width: 75px; height: auto;" />';
+	} else {
+		$img = '<span id="' . esc_attr( 'taxonomy_image_plugin_' . $tt_id ) . '" class="taxonomy-images-set-featured">Set Featured Image</span>';
+	}
 
 	$term = get_term( $term_id, $taxonomy->name );
 
 	$o = "\n" . '<div id="' . esc_attr( 'taxonomy-image-control-' . $tt_id ) . '" class="taxonomy-image-control hide-if-no-js">';
-	$o.= "\n" . '<a class="thickbox taxonomy-image-thumbnail" href="' . esc_url( admin_url( 'media-upload.php' ) . '?type=image&tab=library&post_id=0&TB_iframe=true' ) . '" title="' . esc_attr( sprintf( __( 'Associate an image with the %1$s named &#8220;%2$s&#8221;.', 'taxonomy-images' ), $name, $term->name ) ) . '"><img id="' . esc_attr( 'taxonomy_image_plugin_' . $tt_id ) . '" src="' . esc_url( $img ) . '" alt="" /></a>';
-	$o.= "\n" . '<a class="control upload thickbox" href="' . esc_url( admin_url( 'media-upload.php' ) . '?type=image&tab=type&post_id=0&TB_iframe=true' ) . '" title="' . esc_attr( sprintf( __( 'Upload a new image for this %s.', 'taxonomy-images' ), $name ) ) . '">' . esc_html__( 'Upload.', 'taxonomy-images' ) . '</a>';
-	$o.= "\n" . '<a class="control remove' . $hide . '" href="#" id="' . esc_attr( 'remove-' . $tt_id ) . '" rel="' . esc_attr( $tt_id ) . '" title="' . esc_attr( sprintf( __( 'Remove image from this %s.', 'taxonomy-images' ), $name ) ) . '">' . esc_html__( 'Delete', 'taxonomy-images' ) . '</a>';
+	$o.= "\n" . '<a class="thickbox taxonomy-image-thumbnail" href="' . esc_url( admin_url( 'media-upload.php' ) . '?type=image&width=800&tab=library&post_id=0&TB_iframe=true' ) . '" title="' . esc_attr( sprintf( __( 'Associate an image with the %1$s named &#8220;%2$s&#8221;.', 'taxonomy-images' ), $name, $term->name ) ) . '">'.$img.'</a>';
+	$o.= "\n" . '<a class="remove ' . $hide . '" href="#" id="' . esc_attr( 'remove-' . $tt_id ) . '" rel="' . esc_attr( $tt_id ) . '" title="' . esc_attr( sprintf( __( 'Remove image from this %s.', 'taxonomy-images' ), $name ) ) . '">' . esc_html__( 'Remove Featured Image' ) . '</a>';
 	$o.= "\n" . '<input type="hidden" class="tt_id" name="' . esc_attr( 'tt_id-' . $tt_id ) . '" value="' . esc_attr( $tt_id ) . '" />';
 
 	$o.= "\n" . '<input type="hidden" class="image_id" name="' . esc_attr( 'image_id-' . $tt_id ) . '" value="' . esc_attr( $attachment_id ) . '" />';
@@ -853,7 +857,7 @@ function taxonomy_image_plugin_edit_tags_js() {
 	);
 	wp_localize_script( 'taxonomy-image-plugin-edit-tags', 'taxonomyImagesPlugin', array (
 		'nonce'    => wp_create_nonce( 'taxonomy-image-plugin-remove-association' ),
-		'img_src'  => taxonomy_image_plugin_url( 'default.png' ),
+		'no_img'  => '<span class="taxonomy-images-set-featured">Set Featured Image</span>',
 		'tt_id'    => 0,
 		'image_id' => 0,
 	) );

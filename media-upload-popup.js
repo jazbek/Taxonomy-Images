@@ -58,8 +58,10 @@ jQuery( document ).ready( function( $ ) {
 				if ( 'good' === response.status ) {
 					button.html( TaxonomyImagesModal.removed ).fadeOut( 200, function() {
 						$( this ).hide();
-						var selector = parent.document.getElementById( 'taxonomy_image_plugin_' + ID );
-						$( selector ).attr( 'src', below.taxonomyImagesPlugin.img_src );
+						var oldImage = parent.document.getElementById( 'taxonomy_image_plugin_' + ID );
+						$( oldImage ).replaceWith( $(below.taxonomyImagesPlugin.no_img).attr( 'id', 'taxonomy_image_plugin_' + ID ) );
+						var removeBtn = parent.document.getElementById( 'remove-' + ID );
+						$( removeBtn ).addClass( 'hide' );
 						$( this ).parent().find( '.create-association' ).show();
 						$( this ).html( originalText );
 					} );
@@ -108,8 +110,11 @@ jQuery( document ).ready( function( $ ) {
 					selector = parent.document.getElementById( 'taxonomy-image-control-' + ID );
 
 					/* Update the image on the screen below */
-					$( selector ).find( '.taxonomy-image-thumbnail img' ).each( function ( i, e ) {
-						$( e ).attr( 'src', response.attachment_thumb_src );
+					$( selector ).find( '.taxonomy-images-set-featured' ).each( function ( i, e ) {
+						$( e ).replaceWith( $( '<img />' ).attr({
+							'src' : response.attachment_thumb_src,
+							'id' : $( e ).attr( 'id' )
+						}) );
 					} );
 
 					/* Show delete control on the screen below */

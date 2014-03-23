@@ -20,7 +20,8 @@ jQuery( document ).ready( function( $ ) {
 			success: function ( response ) {
 				if ( 'good' === response.status ) {
 					$( '#remove-' + taxonomyImagesPlugin.tt_id ).addClass( 'hide' );
-					$( '#taxonomy_image_plugin_' + taxonomyImagesPlugin.tt_id ).attr( 'src', taxonomyImagesPlugin.img_src );
+					var imgId = 'taxonomy_image_plugin_' + taxonomyImagesPlugin.tt_id;
+					$( '#' + imgId ).replaceWith( $( taxonomyImagesPlugin.no_img ).attr( 'id', imgId ) ).remove();
 				}
 				else if ( 'bad' === response.status ) {
 					alert( response.why );
