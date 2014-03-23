@@ -551,7 +551,8 @@ function taxonomy_image_plugin_create_association() {
 		taxonomy_image_plugin_json_response( array(
 			'status' => 'good',
 			'why'    => esc_html__( 'Image successfully associated', 'taxonomy-images' ),
-			'attachment_thumb_src' => taxonomy_image_plugin_get_image_src( $image_id )
+			'attachment_thumb_src' => taxonomy_image_plugin_get_image_src( $image_id ),
+			'image_id' => $image_id,
 		) );
 	}
 	else {

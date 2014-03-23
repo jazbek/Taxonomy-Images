@@ -58,10 +58,19 @@ jQuery( document ).ready( function( $ ) {
 				if ( 'good' === response.status ) {
 					button.html( TaxonomyImagesModal.removed ).fadeOut( 200, function() {
 						$( this ).hide();
+
+						// remove the thumbnail & replace it with "set featured image"
 						var oldImage = parent.document.getElementById( 'taxonomy_image_plugin_' + ID );
-						$( oldImage ).replaceWith( $(below.taxonomyImagesPlugin.no_img).attr( 'id', 'taxonomy_image_plugin_' + ID ) );
+						$( oldImage ).replaceWith( $( below.taxonomyImagesPlugin.no_img ).attr( 'id', 'taxonomy_image_plugin_' + ID ) );
+
+						// hide the remove button that was under the thumbnail
 						var removeBtn = parent.document.getElementById( 'remove-' + ID );
 						$( removeBtn ).addClass( 'hide' );
+
+						// update the hidden image id field
+						$( parent.document.getElementById( 'taxonomy-image-control-' + ID ) ).find( '.image_id' ).val( '0' );
+
+						// show the create association button
 						$( this ).parent().find( '.create-association' ).show();
 						$( this ).html( originalText );
 					} );
@@ -107,18 +116,21 @@ jQuery( document ).ready( function( $ ) {
 						$( e ).find( '.remove-association' ).hide();
 					} );
 
-					selector = parent.document.getElementById( 'taxonomy-image-control-' + ID );
+					var $selector = $( parent.document.getElementById( 'taxonomy-image-control-' + ID ) );
 
 					/* Update the image on the screen below */
-					$( selector ).find( '.taxonomy-images-set-featured' ).each( function ( i, e ) {
+					$selector.find( '.taxonomy-images-set-featured' ).each( function ( i, e ) {
 						$( e ).replaceWith( $( '<img />' ).attr({
 							'src' : response.attachment_thumb_src,
 							'id' : $( e ).attr( 'id' )
 						}) );
 					} );
 
+					// Update the hidden image_id field
+					$selector.find( '.image_id' ).val( response.image_id );
+
 					/* Show delete control on the screen below */
-					$( selector ).find( '.remove' ).each( function ( i, e ) {
+					$selector.find( '.remove' ).each( function ( i, e ) {
 						$( e ).removeClass( 'hide' );
 					} );
 
